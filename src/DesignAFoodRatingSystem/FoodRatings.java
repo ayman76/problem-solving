@@ -1,16 +1,16 @@
 package DesignAFoodRatingSystem;
 
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.TreeSet;
 
-class FoodRating {
+class FoodInfo {
     private String food;
     private String cuisine;
     private int rating;
 
-    public FoodRating(String food, String cuisine, int rating) {
+    public FoodInfo(String food, String cuisine, int rating) {
         this.food = food;
         this.cuisine = cuisine;
         this.rating = rating;
@@ -42,7 +42,7 @@ class FoodRating {
 
     @Override
     public String toString() {
-        return "FoodRating{" +
+        return "FoodInfo{" +
                 "food='" + food + '\'' +
                 ", cuisine='" + cuisine + '\'' +
                 ", rating=" + rating +
@@ -53,38 +53,37 @@ class FoodRating {
 
 public class FoodRatings {
 
-    Hashtable<String, FoodRating> foodRatings = new Hashtable<>();
+    Map<String, FoodInfo> foodInfo = new HashMap<>();
+    Map<String, TreeSet<FoodInfo>> foodRatings = new Hashtable<>();
 
     public FoodRatings(String[] foods, String[] cuisines, int[] ratings) {
         addFoodRatings(foods, cuisines, ratings);
     }
 
     public void changeRating(String food, int newRating) {
-        if(foodRatings.containsKey(food)){
-            FoodRating foundedFoodRating = foodRatings.get(food);
-            foundedFoodRating.setRating(newRating);
-            foodRatings.put(food, foundedFoodRating);
-        }
-
-
+        FoodInfo foodRating = foodInfo.get(food);
+        TreeSet<FoodInfo> foundedFoodRating = foodRatings.get(foodRating.getCuisine());
+        foundedFoodRating.remove(foodRating);
+        foodRating.setRating(newRating);
+        foundedFoodRating.add(foodRating);
     }
 
     public String highestRated(String cuisine) {
-        Hashtable<String, Integer> cuisineFoodRatings = new Hashtable<>();
-        for (FoodRating foodRating: foodRatings.values()){
-            if(foodRating.getCuisine().equals(cuisine)){
-                cuisineFoodRatings.put(foodRating.getFood(), foodRating.getRating());
-            }
-        }
-        String highestRatedFood = Collections.max(cuisineFoodRatings.entrySet(),
-                Comparator.<Map.Entry<String, Integer>, Integer>comparing(Map.Entry::getValue)
-                        .thenComparing(Map.Entry::getKey)).getKey();
-        return highestRatedFood;
+        return foodRatings.get(cuisine).first().getFood();
     }
 
-    private void addFoodRatings(String[] foods, String[] cuisines, int[] ratings){
-        for (int i = 0; i < foods.length; i++){
-            foodRatings.put(foods[i], new FoodRating(foods[i], cuisines[i], ratings[i]));
+    private void addFoodRatings(String[] foods, String[] cuisines, int[] ratings) {
+        for (int i = 0; i < foods.length; i++) {
+
+            FoodInfo foodRating = new FoodInfo(foods[i], cuisines[i], ratings[i]);
+            foodRatings.putIfAbsent(cuisines[i], new TreeSet<>((a, b) -> {
+                if (a.getRating() == b.getRating()) return a.getFood().compareTo(b.getFood());
+                return Integer.compare(b.getRating(), a.getRating());
+            }));
+
+            foodRatings.get(cuisines[i]).add(foodRating);
+
+            foodInfo.put(foods[i], foodRating);
         }
     }
 }

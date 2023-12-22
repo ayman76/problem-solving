@@ -9,16 +9,16 @@ public class Main {
 
         FoodRatings foodRatings = new FoodRatings(foods, cuisines, ratings);
 
-//        System.out.println(foodRatings.foodRatings.toString());
+        System.out.println(foodRatings.foodRatings.toString());
         System.out.println(foodRatings.highestRated("korean"));
         System.out.println(foodRatings.highestRated("japanese"));
 
         foodRatings.changeRating("sushi", 16);
-//        System.out.println(foodRatings.foodRatings.toString());
+        System.out.println(foodRatings.foodRatings.toString());
         System.out.println(foodRatings.highestRated("japanese"));
 
         foodRatings.changeRating("ramen", 16);
-//        System.out.println(foodRatings.foodRatings.toString());
+        System.out.println(foodRatings.foodRatings.toString());
         System.out.println(foodRatings.highestRated("japanese"));
     }
 }
